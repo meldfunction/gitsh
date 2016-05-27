@@ -21,11 +21,16 @@ describe Gitsh::CLI do
       it 'calls the script runner with -' do
         script_runner = double('ScriptRunner', run: nil)
         interactive_runner = double('InteractiveRunner', run: nil)
+        env = double(
+          'Environment',
+          tty?: false,
+          git_command: fake_git_path,
+        )
         cli = Gitsh::CLI.new(
           args: [],
           script_runner: script_runner,
           interactive_runner: interactive_runner,
-          env: double('Environment', tty?: false),
+          env: env,
         )
 
         cli.run
@@ -54,7 +59,7 @@ describe Gitsh::CLI do
 
     context 'with an unreadable script file' do
       it 'exits' do
-        env = double('env', puts_error: nil)
+        env = double('env', puts_error: nil, git_command: fake_git_path)
         script_runner = double('ScriptRunner')
         allow(script_runner).to receive(:run).
           and_raise(Gitsh::NoInputError, 'Oh no!')
@@ -77,6 +82,19 @@ describe Gitsh::CLI do
         cli = Gitsh::CLI.new(args: %w( --bad-argument ), env: env)
 
         expect { cli.run }.to raise_exception(SystemExit)
+      end
+    end
+
+    context 'with a non-existent git' do
+      it 'exits with a helpful error message' do
+        env = double('Environment', puts_error: nil, git_command: 'nonexistent')
+        cli = Gitsh::CLI.new(args: [], env: env)
+
+        expect { cli.run }.to raise_exception(SystemExit)
+        expect(env).to have_received(:puts_error).with(
+          'gitsh: No such executable git: nonexistent. Please specify an ' \
+          'executable git using the --git option.',
+        )
       end
     end
   end

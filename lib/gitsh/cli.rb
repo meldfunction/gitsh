@@ -24,7 +24,9 @@ module Gitsh
       parse_arguments
       if unparsed_args.any?
         exit_with_usage_message
-      elsif script_file
+      end
+      ensure_executable_git
+      if script_file
         run_script
       else
         interactive_runner.run
@@ -81,6 +83,16 @@ module Gitsh
           exit EX_OK
         end
       end
+    end
+
+    def ensure_executable_git
+      IO.popen(env.git_command).close
+    rescue Errno::ENOENT
+      env.puts_error(
+        "gitsh: No such executable git: #{env.git_command}. Please " \
+        'specify an executable git using the --git option.',
+      )
+      exit EX_DATAERR
     end
   end
 end
