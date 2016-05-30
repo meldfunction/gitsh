@@ -89,8 +89,8 @@ module Gitsh
       IO.popen(env.git_command).close
     rescue Errno::ENOENT
       env.puts_error(
-        "gitsh: No such executable git: #{env.git_command}. Please " \
-        'specify an executable git using the --git option.',
+        "gitsh: #{env.git_command}: No such file or directory\nEnsure git is "\
+        'on your PATH, or specify the path to git using the --git option',
       )
       exit EX_UNAVAILABLE
     end

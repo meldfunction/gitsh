@@ -92,8 +92,8 @@ describe Gitsh::CLI do
 
         expect { cli.run }.to raise_exception(SystemExit)
         expect(env).to have_received(:puts_error).with(
-          'gitsh: No such executable git: nonexistent. Please specify an ' \
-          'executable git using the --git option.',
+          "gitsh: nonexistent: No such file or directory\nEnsure git is on "\
+          'your PATH, or specify the path to git using the --git option',
         )
       end
     end
