@@ -92,7 +92,7 @@ module Gitsh
         "gitsh: No such executable git: #{env.git_command}. Please " \
         'specify an executable git using the --git option.',
       )
-      exit EX_DATAERR
+      exit EX_UNAVAILABLE
     end
   end
 end
