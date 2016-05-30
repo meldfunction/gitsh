@@ -93,6 +93,12 @@ module Gitsh
         'on your PATH, or specify the path to git using the --git option',
       )
       exit EX_UNAVAILABLE
+    rescue Errno::EACCES
+      env.puts_error(
+        "gitsh: #{env.git_command}: Permission denied\nEnsure git is "\
+        'executable',
+      )
+      exit EX_UNAVAILABLE
     end
   end
 end

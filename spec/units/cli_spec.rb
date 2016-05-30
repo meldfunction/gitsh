@@ -97,5 +97,28 @@ describe Gitsh::CLI do
         )
       end
     end
+
+    context 'with a non-executable git' do
+      it 'exits with a helpful error message' do
+        non_executable = Tempfile.new('git')
+        non_executable.close
+        begin
+          env = double(
+            'Environment',
+            puts_error: nil,
+            git_command: non_executable.path,
+          )
+          cli = Gitsh::CLI.new(args: [], env: env)
+
+          expect { cli.run }.to raise_exception(SystemExit)
+          expect(env).to have_received(:puts_error).with(
+            "gitsh: #{non_executable.path}: Permission denied\nEnsure git is "\
+            'executable',
+          )
+        ensure
+          non_executable.unlink
+        end
+      end
+    end
   end
 end
